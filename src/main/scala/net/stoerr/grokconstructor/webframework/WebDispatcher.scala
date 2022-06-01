@@ -3,7 +3,6 @@ package net.stoerr.grokconstructor.webframework
 import java.util.logging.{Level, Logger}
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
-import com.google.apphosting.api.ApiProxy
 import net.stoerr.grokconstructor.automatic.AutomaticDiscoveryView
 import net.stoerr.grokconstructor.incremental.{IncrementalConstructionInputView, IncrementalConstructionStepView}
 import net.stoerr.grokconstructor.matcher.MatcherEntryView
@@ -36,15 +35,12 @@ class WebDispatcher extends HttpServlet {
   private val reqIdAttr = "_requestid"
 
   private def requestid(req: HttpServletRequest): String =
-    if (req.getAttribute(reqIdAttr) != null) req.getAttribute(reqIdAttr).toString
+    if (req.getAttribute(reqIdAttr) != null) 
+        req.getAttribute(reqIdAttr).toString
     else {
-      Option(ApiProxy.getCurrentEnvironment).map(_.getAttributes)
-        .map(_.get("com.google.appengine.runtime.request_log_id")).map(_.asInstanceOf[String])
-        .getOrElse {
-          val randomReqId = Random.alphanumeric.take(8).mkString("")
-          req.setAttribute(reqIdAttr, randomReqId)
-          randomReqId
-        }
+        val randomReqId = Random.alphanumeric.take(8).mkString("")
+        req.setAttribute(reqIdAttr, randomReqId)
+        randomReqId
     }
 
   override def doGet(req: HttpServletRequest, resp: HttpServletResponse) {
